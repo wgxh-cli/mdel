@@ -6,6 +6,7 @@ pub use combinators::map::*;
 pub use combinators::pair::*;
 pub use combinators::and_then::*;
 pub use combinators::until::*;
+pub use combinators::until_last::*;
 pub use combinators::condition::*;
 
 #[derive(Debug, PartialEq, Eq)]

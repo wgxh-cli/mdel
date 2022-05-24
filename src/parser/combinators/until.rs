@@ -28,7 +28,7 @@ where
           results.push(result.output);
           next_input = result.next_input;
         } else {
-          break Ok(ResultData::new(results, result.next_input));
+          break Ok(ResultData::new(results, next_input));
         }
       } else {
         return Err(next_input);

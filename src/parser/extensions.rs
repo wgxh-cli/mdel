@@ -3,6 +3,7 @@ use super::{
   ResultData,
   Map,
   Until,
+  UntilLast,
   Condition,
 };
 
@@ -20,6 +21,13 @@ pub trait ParserExt<O>: Parser<O> {
     Self: Sized + 'a,
   {
     Until::new(condition, self)
+  }
+  fn until_last<'a, F>(self, condition: F) -> UntilLast<'a, O, F>
+  where
+    F: for<'b> Fn(&'b ResultData<O>) -> bool + 'a,
+    Self: Sized + 'a,
+  {
+    UntilLast::new(condition, self)
   }
   fn condition<'a, F>(self, condition: F) -> Condition<'a, O, F>
   where
