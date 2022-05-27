@@ -8,6 +8,7 @@ pub use combinators::and_then::*;
 pub use combinators::until::*;
 pub use combinators::until_last::*;
 pub use combinators::condition::*;
+pub use combinators::selector::*;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct ResultData<O> {

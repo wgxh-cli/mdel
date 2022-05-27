@@ -2,6 +2,7 @@ use crate::parser::{
   Parser,
   ParserExt,
   pair,
+  left,
 };
 use super::utils::Next;
 
@@ -29,23 +30,26 @@ pub struct Stress {
 }
 
 pub fn stress() -> impl Parser<Stress> {
-  pair(
+  left(
+    pair(
+      Next
+        .until(|result| {
+          result.output == '*'
+        })
+        .map(|chars| chars.len()),
+      Next
+        .until(|result| result.output != '*')
+        .map(|chars| chars.into_iter().collect::<String>())
+    )
+    .condition(|result| result.next_input.len() == result.output.0)
+    .map(|(level, content)| {
+      Stress {
+        level: StressLevel::from(level as u8),
+        content,
+      }
+    }),
     Next
-      .until(|result| {
-        result.output == '*'
-      })
-      .map(|chars| chars.len()),
-    Next
-      .until(|result| result.output != '*')
-      .map(|chars| chars.into_iter().collect::<String>())
   )
-  .condition(|result| result.next_input.len() == result.output.0)
-  .map(|(level, content)| {
-    Stress {
-      level: StressLevel::from(level as u8),
-      content,
-    }
-  })
 }
 
 #[test]

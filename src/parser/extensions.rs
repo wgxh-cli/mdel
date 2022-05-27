@@ -4,7 +4,7 @@ use super::{
   Map,
   Until,
   UntilLast,
-  Condition,
+  Condition
 };
 
 pub trait ParserExt<O>: Parser<O> {
