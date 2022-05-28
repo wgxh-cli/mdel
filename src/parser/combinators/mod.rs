@@ -7,3 +7,4 @@ pub mod repeat;
 pub mod until;
 pub mod until_last;
 pub mod condition;
+pub mod strategy;

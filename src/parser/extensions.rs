@@ -1,10 +1,13 @@
 use super::{
   Parser,
+  ParserResult,
   ResultData,
+  Operate,
   Map,
   Until,
   UntilLast,
-  Condition
+  Condition,
+  Strategy,
 };
 
 pub trait ParserExt<O>: Parser<O> {
@@ -35,6 +38,23 @@ pub trait ParserExt<O>: Parser<O> {
     Self: Sized + 'a,
   {
     Condition::new(self, condition)
+  }
+  fn operate<'a, A, F>(self, operator: F) -> Operate<'a, O, A>
+  where
+    A: 'a,
+    F: Fn(ResultData<O>) -> ParserResult<A> + 'a,
+    Self: Sized + 'a,
+  {
+    Operate::new(self, operator)
+  }
+  fn strategy<'a, A, P, T>(self, trigger: T, strategies: Vec<P>) -> Strategy<'a, O, A>
+  where
+    A: 'a,
+    P: Parser<A> + 'a,
+    T: Fn(ResultData<O>) -> usize + 'a,
+    Self: Sized + 'a,
+  {
+    Strategy::new(self, trigger, strategies)
   }
 }
 

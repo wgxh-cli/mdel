@@ -2,6 +2,7 @@ pub mod combinators;
 pub mod extensions;
 
 pub use extensions::*;
+pub use combinators::operate::*;
 pub use combinators::map::*;
 pub use combinators::pair::*;
 pub use combinators::and_then::*;
@@ -9,8 +10,9 @@ pub use combinators::until::*;
 pub use combinators::until_last::*;
 pub use combinators::condition::*;
 pub use combinators::selector::*;
+pub use combinators::strategy::*;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct ResultData<O> {
   pub output: O,
   pub next_input: String,
@@ -46,26 +48,5 @@ impl<'a, O> BoxedParser<'a, O> {
 impl<'a, O> Parser<O> for BoxedParser<'a, O> {
   fn parse(&self, input: String) -> ParserResult<O> {
     self.parser.parse(input)
-  }
-}
-
-pub struct FnParser<'a, A> {
-  parser_fn: Box<dyn Fn(String) -> ParserResult<A> + 'a>,
-}
-
-impl<'a, A> Parser<A> for FnParser<'a, A> {
-  fn parse(&self, input: String) -> ParserResult<A> {
-    (self.parser_fn)(input)
-  }
-}
-
-impl<'a, A, F> From<F> for FnParser<'a, A>
-where
-  F: Fn(String) -> ParserResult<A> + 'a,
-{
-  fn from(parser_fn: F) -> Self {
-    FnParser {
-      parser_fn: Box::new(parser_fn),
-    }
   }
 }

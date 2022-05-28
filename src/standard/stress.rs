@@ -1,10 +1,10 @@
 use crate::parser::{
   Parser,
   ParserExt,
+  ResultData,
   pair,
-  left,
 };
-use super::utils::Next;
+use crate::standard::utils::Next;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum StressLevel {
@@ -30,26 +30,30 @@ pub struct Stress {
 }
 
 pub fn stress() -> impl Parser<Stress> {
-  left(
-    pair(
-      Next
-        .until(|result| {
-          result.output == '*'
-        })
-        .map(|chars| chars.len()),
-      Next
-        .until(|result| result.output != '*')
-        .map(|chars| chars.into_iter().collect::<String>())
-    )
-    .condition(|result| result.next_input.len() == result.output.0)
-    .map(|(level, content)| {
-      Stress {
-        level: StressLevel::from(level as u8),
-        content,
-      }
-    }),
+  pair(
     Next
+      .until(|result| {
+        result.output == '*'
+      })
+      .map(|chars| chars.len()),
+    Next
+      .until(|result| result.output != '*')
+      .map(|chars| chars.into_iter().collect::<String>())
   )
+  .condition(|result| result.next_input.len() == result.output.0)
+  .operate(|result| {
+    let level = result.output.0;
+    Ok(ResultData::new(
+      result.output,
+      result.next_input.chars().skip(level).collect()
+    ))
+  })
+  .map(|(level, content)| {
+    Stress {
+      level: StressLevel::from(level as u8),
+      content,
+    }
+  })
 }
 
 #[test]
