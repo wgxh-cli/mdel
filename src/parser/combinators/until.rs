@@ -14,7 +14,7 @@ where
   condition: Box<F>,
 }
 
-impl<'a, A, F> Parser<Vec<A>> for Until<'a, A, F>
+impl<'a, A, F> Parser<'a, Vec<A>> for Until<'a, A, F>
 where
   F: for<'b> Fn(&'b ResultData<A>) -> bool + 'a,
   A: 'a,
@@ -44,7 +44,7 @@ where
 {
   pub fn new<P>(condition: F, parser: P) -> Self
   where
-    P: Parser<A> + 'a,
+    P: Parser<'a, A> + 'a,
   {
     Until {
       condition: Box::new(condition),
@@ -55,7 +55,7 @@ where
 
 pub fn until<'a, A, P, F>(condition: F, parser: P) -> Until<'a, A, F>
 where
-  P: Parser<A> + 'a,
+  P: Parser<'a, A> + 'a,
   F: for<'b> Fn(&'b ResultData<A>) -> bool + 'a,
 {
   Until::new(condition, parser)

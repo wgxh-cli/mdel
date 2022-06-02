@@ -1,15 +1,20 @@
 use super::super::{BoxedParser, ResultData, ParserResult, Parser};
 
 pub struct Map<'a, A, B>
+where
+  B: 'a,
 {
   pub map_fn: Box<dyn Fn(A) -> B + 'a>,
   pub parser: BoxedParser<'a, A>,
 }
 
-impl<'a, A, B> Map<'a, A, B> {
+impl<'a, A, B> Map<'a, A, B>
+where
+  B: 'a,
+{
   pub fn new<P, F>(parser: P, map_fn: F) -> Self
   where
-    P: Parser<A> + 'a,
+    P: Parser<'a, A> + 'a,
     F: Fn(A) -> B + 'a,
   {
     Map {
@@ -19,7 +24,10 @@ impl<'a, A, B> Map<'a, A, B> {
   }
 }
 
-impl<'a, A, B> Parser<B> for Map<'a, A, B> {
+impl<'a, A, B> Parser<'a, B> for Map<'a, A, B>
+where
+  B: 'a,
+{
   fn parse(&self, input: String) -> ParserResult<B> {
     self.parser.parse(input).map(|result| {
       ResultData::new((self.map_fn)(result.output), result.next_input)
@@ -29,7 +37,7 @@ impl<'a, A, B> Parser<B> for Map<'a, A, B> {
 
 pub fn map<'a, P, A, B, F>(parser: P, map_fn: F) -> Map<'a, A, B>
 where
-  P: Parser<A> + 'a,
+  P: Parser<'a, A> + 'a,
   F: Fn(A) -> B + 'a
 {
   Map::new(parser, map_fn)

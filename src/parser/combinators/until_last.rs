@@ -13,7 +13,7 @@ where
   condition: Box<F>,
 }
 
-impl<'a, A, F> Parser<Vec<A>> for UntilLast<'a, A, F>
+impl<'a, A, F> Parser<'a, Vec<A>> for UntilLast<'a, A, F>
 where
   F: for<'b> Fn(&'b ResultData<A>) -> bool,
 {
@@ -39,7 +39,7 @@ impl<'a, A, F> UntilLast<'a, A, F>
 where
   F: for<'b> Fn(&'b ResultData<A>) -> bool,
 {
-  pub fn new(condition: F, parser: impl Parser<A> + 'a) -> Self {
+  pub fn new(condition: F, parser: impl Parser<'a, A> + 'a) -> Self {
     UntilLast {
       condition: Box::new(condition),
       parser: BoxedParser::new(parser),

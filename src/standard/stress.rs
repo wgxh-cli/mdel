@@ -29,14 +29,14 @@ pub struct Stress {
   pub content: String,
 }
 
-pub fn stress() -> impl Parser<Stress> {
+pub fn stress<'a>() -> impl Parser<'a, Stress> {
   pair(
-    Next
+    Next::new()
       .until(|result| {
         result.output == '*'
       })
       .map(|chars| chars.len()),
-    Next
+    Next::new()
       .until(|result| result.output != '*')
       .map(|chars| chars.into_iter().collect::<String>())
   )

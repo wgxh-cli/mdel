@@ -11,12 +11,12 @@ pub struct Strategy<'a, A, B> {
   trigger: Box<dyn Fn(ResultData<A>) -> usize + 'a>,
 }
 
-impl<'a, A, B> Parser<B> for Strategy<'a, A, B> {
+impl<'a, A, B> Parser<'a, B> for Strategy<'a, A, B> {
   fn parse(&self, input: String) -> ParserResult<B> {
     self.parser.parse(input).and_then(|result| {
       let next_input = result.next_input.clone();
       let index = (self.trigger)(result);
-      if let Some(strategy) = self.strategies.into_iter().nth(index) {
+      if let Some(strategy) = self.strategies.get(index) {
         strategy.parse(next_input)
       } else {
         Err(next_input)
@@ -25,12 +25,15 @@ impl<'a, A, B> Parser<B> for Strategy<'a, A, B> {
   }
 }
 
-impl<'a, A, B> Strategy<'a, A, B> {
-  pub fn new<P, T, S>(parser: P, trigger: T, strategies: Vec<S>) -> Self
+impl<'a, A, B> Strategy<'a, A, B>
+where
+  A: 'a,
+  B: 'a,
+{
+  pub fn new<P, T>(parser: P, trigger: T, strategies: Vec<BoxedParser<'a, B>>) -> Self
   where
-    P: Parser<A> + 'a,
+    P: Parser<'a, A> + 'a,
     T: Fn(ResultData<A>) -> usize + 'a,
-    S: Parser<B> + 'a,
   {
     Strategy {
       parser: BoxedParser::new(parser),

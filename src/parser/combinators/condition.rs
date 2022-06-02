@@ -14,7 +14,7 @@ where
   condition: Box<F>,
 }
 
-impl<'a, A, F> Parser<A> for Condition<'a, A, F>
+impl<'a, A, F> Parser<'a, A> for Condition<'a, A, F>
 where
   A: 'a,
   F: for<'b> Fn(&'b ResultData<A>) -> bool + 'a,
@@ -39,7 +39,7 @@ where
 {
   pub fn new<P>(parser: P, condition: F) -> Self
   where
-    P: Parser<A> + 'a,
+    P: Parser<'a, A> + 'a,
   {
     Condition {
       parser: BoxedParser::new(parser),
@@ -52,7 +52,7 @@ pub fn condition<'a, A, F, P>(parser: P, condition: F) -> Condition<'a, A, F>
 where
   A: 'a,
   F: for<'b> Fn(&'b ResultData<A>) -> bool + 'a,
-  P: Parser<A> + 'a,
+  P: Parser<'a, A> + 'a,
 {
   Condition::new(parser, condition)
 }

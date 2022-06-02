@@ -5,7 +5,7 @@ pub struct Pair<'a, A, B> {
   second: BoxedParser<'a, B>,
 }
 
-impl<'a, A, B> Parser<(A, B)> for Pair<'a, A, B> {
+impl<'a, A, B> Parser<'a, (A, B)> for Pair<'a, A, B> {
   fn parse(&self, input: String) -> ParserResult<(A, B)> {
     self.first.parse(input).and_then(|result_a| {
       self.second.parse(result_a.next_input).map(|result_b| {
@@ -18,8 +18,8 @@ impl<'a, A, B> Parser<(A, B)> for Pair<'a, A, B> {
 impl<'a, A, B> Pair<'a, A, B> {
   pub fn new<F, S>(first: F, second: S) -> Self
   where
-    F: Parser<A> + 'a,
-    S: Parser<B> + 'a,
+    F: Parser<'a, A> + 'a,
+    S: Parser<'a, B> + 'a,
   {
     Pair {
       first: BoxedParser::new(first),
@@ -30,8 +30,8 @@ impl<'a, A, B> Pair<'a, A, B> {
 
 pub fn pair<'a, F, S, A, B>(first: F, second: S) -> Pair<'a, A, B>
 where
-  F: Parser<A> + 'a,
-  S: Parser<B> + 'a,
+  F: Parser<'a, A> + 'a,
+  S: Parser<'a, B> + 'a,
 {
   Pair::new(first, second)
 }

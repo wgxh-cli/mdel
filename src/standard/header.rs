@@ -11,12 +11,12 @@ pub struct Header {
   pub level: u8,
 }
 
-pub fn header() -> impl Parser<Header> {
+pub fn header<'a>() -> impl Parser<'a, Header> {
   pair(
-    Next
+    Next::new()
       .until_last(|result| result.output != ' ' && result.output == '#')
       .map(|chars| chars.len() as u8),
-    Next
+    Next::new()
       .until_last(|result| result.output != '\n')
       .map(|chars| chars.into_iter().collect::<String>())
   )
